@@ -18,6 +18,7 @@ class UTF8Recoder:
             encoding = results['encoding']
             if not encoding:
                 raise Exception('Could not determine encoding')
+            self.encoding = encoding
         f.seek(0)
         self.reader = codecs.getreader(encoding)(f, 'ignore')
 
@@ -96,6 +97,7 @@ class CSVRowSet(RowSet):
         self.fileobj = UTF8Recoder(seekable_fileobj, encoding)
         self.lines = ilines(self.fileobj)
         self._sample = []
+        self.encoding = self.fileobj.encoding
         self.delimiter = delimiter
         self.quotechar = quotechar
         self.window = window or 1000
