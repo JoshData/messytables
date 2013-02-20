@@ -1,4 +1,4 @@
-import zipfile, StringIO
+import zipfile, StringIO, os.path
 
 from messytables import TableSet
 
@@ -23,8 +23,12 @@ class ZIPTableSet(TableSet):
         found = []
         with zipfile.ZipFile(fileobj, 'r') as z:
             for f in z.infolist():
-                ext = None
-                if "." in f.filename: ext = f.filename[f.filename.rindex(".")+1:]
+                # Get the file extension to help guess the file type.
+                fnbase, ext = os.path.splitext(f.filename)
+                if ext in ("", "."):
+                    ext = None
+                else:
+                    ext = ext[1:] # strip off '.'
                 
                 try:
                     filetables = AnyTableSet.from_fileobj(z.open(f), extension=ext)
