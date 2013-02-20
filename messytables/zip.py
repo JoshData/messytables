@@ -9,7 +9,7 @@ class ZIPTableSet(TableSet):
         self._tables = tables
 
     @classmethod
-    def from_fileobj(cls, fileobj):
+    def from_fileobj(cls, fileobj, inner_data_format=None, inner_parser_args={ }):
         # zipfile requires a seekable stream, and actually one that can
         # handle .seek(offset, 2), i.e. seeking relative to the end of
         # the stream. messytables.seekable_stream only provides a stream
@@ -18,20 +18,32 @@ class ZIPTableSet(TableSet):
         if not hasattr(fileobj, "seek"):
             fileobj = StringIO.StringIO(fileobj.read())
         
-        from messytables.any import AnyTableSet # avoid circular dependency by not importing at the top
         tables = []
         found = []
         with zipfile.ZipFile(fileobj, 'r') as z:
             for f in z.infolist():
-                # Get the file extension to help guess the file type.
-                fnbase, ext = os.path.splitext(f.filename)
-                if ext in ("", "."):
-                    ext = None
+                if inner_data_format == None:
+                    # Auto-detect the file format of inside files.
+                    
+                    from messytables.any import AnyTableSet # avoid circular dependency by not importing at the top
+                    
+                    # Get the file extension to help guess the file type.
+                    fnbase, ext = os.path.splitext(f.filename)
+                    if ext in ("", "."):
+                        ext = None
+                    else:
+                        ext = ext[1:] # strip off '.'
+                    
+                    data_format = AnyTableSet
+                    inner_parser_args = { "extension": ext }
+                    
                 else:
-                    ext = ext[1:] # strip off '.'
+                    # Use the provided TableSet class.
+                    data_format = inner_data_format
                 
+                # Load the file.
                 try:
-                    filetables = AnyTableSet.from_fileobj(z.open(f), extension=ext)
+                    filetables = data_format.from_fileobj(z.open(f), **inner_parser_args)
                 except ValueError as e:
                     found.append(f.filename + ": " + e.message)
                     continue
