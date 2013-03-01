@@ -1,4 +1,4 @@
-import zipfile, StringIO, os.path
+import zipfile, cStringIO, os.path
 
 from messytables import TableSet
 
@@ -15,8 +15,17 @@ class ZIPTableSet(TableSet):
         # the stream. messytables.seekable_stream only provides a stream
         # that supports seeking by absolute position and only near the
         # beginning. So we'll have to slurp the whole thing in.
-        if not hasattr(fileobj, "seek"):
-            fileobj = StringIO.StringIO(fileobj.read())
+        try:
+            fileobj.seek(0, 2)
+            fileobj.seek(0, 0)
+        except:
+            f0 = fileobj
+            fileobj = cStringIO.StringIO()
+            while True:
+                d = f0.read(2048)
+                if not d: break
+                fileobj.write(d)
+            fileobj.seek(0, 0)
         
         tables = []
         found = []
