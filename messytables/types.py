@@ -147,6 +147,14 @@ def type_guess(rows, types=TYPES, strict=False):
     guesses = defaultdict(lambda: defaultdict(int))
     for row in rows:
         for i, cell in enumerate(row):
+            # XLS parsing already gives us data types, so cell.value
+            # may have something besides a string. Since we assume
+            # below that cell.value is a string that we have to type-guess,
+            # let's handle the case where a non-String type is already set.
+            if cell.type != None and not isinstance(cell.type, StringType):
+                guesses[i][cell.type] += 1
+                continue
+            
             # add string guess so that we have at least one guess
             guesses[i][StringType()] = 0
             for type in types:
