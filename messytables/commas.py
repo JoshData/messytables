@@ -18,7 +18,7 @@ class UTF8Recoder:
             encoding = results['encoding']
             if not encoding:
                 raise Exception('Could not determine encoding')
-            self.encoding = encoding
+        self.encoding = encoding
         f.seek(0)
         self.reader = codecs.getreader(encoding)(f, 'ignore')
 
