@@ -9,6 +9,7 @@ import dateutil.parser as parser
 
 from messytables.dateparser import DATE_FORMATS, is_date
 
+NA_STRINGS = ("", "n/a") # value.strip().lower() in NA_STRINGS 
 
 class CellType(object):
     """ A cell type maintains information about the format
@@ -59,6 +60,7 @@ class IntegerType(CellType):
     guessing_weight = 6
 
     def cast(self, value):
+        if value.strip().lower() in NA_STRINGS: return None
         try:
             return int(value)
         except:
@@ -70,6 +72,7 @@ class FloatType(CellType):
     guessing_weight = 4
 
     def cast(self, value):
+        if value.strip().lower() in NA_STRINGS: return None
         return locale.atof(value)
 
 
@@ -78,6 +81,7 @@ class DecimalType(CellType):
     guessing_weight = 5
 
     def cast(self, value):
+        if value.strip().lower() in NA_STRINGS: return None
         return decimal.Decimal(value)
 
 
@@ -104,6 +108,7 @@ class DateType(CellType):
                 pass
 
     def cast(self, value):
+        if value.strip().lower() in NA_STRINGS: return None
         if self.format is None:
             return value
         return datetime.strptime(value, self.format)
@@ -129,6 +134,7 @@ class DateUtilType(CellType):
     guessing_weight = 3
 
     def cast(self, value):
+        if value.strip().lower() in NA_STRINGS: return None
         return parser.parse(value)
 
 
@@ -158,7 +164,7 @@ def type_guess(rows, types=TYPES, strict=False):
             # add string guess so that we have at least one guess
             guesses[i][StringType()] = 0
             for type in types:
-                if not cell.value:
+                if not cell.value or cell.value.strip().lower() in NA_STRINGS:
                     continue
                 guess = type.test(cell.value)
                 if guess is None:
