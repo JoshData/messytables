@@ -39,7 +39,7 @@ class AnyTableSet(TableSet):
                 (extension and extension.lower() in ('tsv',)):
             return CSVTableSet.from_fileobj(fileobj, delimiter='\t')
         if mimetype in ('application/ms-excel', 'application/vnd.ms-excel',
-                'application/xls') or (extension and extension.lower() in \
+                'application/xls', 'application/excel') or (extension and extension.lower() in \
                     ('xls',)):
             return XLSTableSet.from_fileobj(fileobj)
         if mimetype in ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',) \
