@@ -9,7 +9,7 @@ import dateutil.parser as parser
 
 from messytables.dateparser import DATE_FORMATS, is_date
 
-NA_STRINGS = ("", "n/a") # value.strip().lower() in NA_STRINGS 
+NA_STRINGS = ("", "n/a", "null") # value.strip().lower() in NA_STRINGS 
 
 class CellType(object):
     """ A cell type maintains information about the format
