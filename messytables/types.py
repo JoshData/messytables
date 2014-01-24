@@ -152,7 +152,7 @@ def type_guess(rows, types=TYPES, strict=False):
     if parsing fails for a single cell in the column."""
     guesses = defaultdict(lambda: defaultdict(int))
     for row in rows:
-        for i, cell in enumerate(row):
+    	for i, cell in enumerate(row):
             # XLS parsing already gives us data types, so cell.value
             # may have something besides a string. Since we assume
             # below that cell.value is a string that we have to type-guess,
